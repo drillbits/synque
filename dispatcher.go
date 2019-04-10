@@ -48,7 +48,7 @@ func (q *Queue) Has(key string) bool {
 	return ok
 }
 
-func (q Queue) MarshalJSON() ([]byte, error) {
+func (q *Queue) MarshalJSON() ([]byte, error) {
 	var tasks []*Task
 	q.s.Range(func(k, v interface{}) bool {
 		if task, ok := v.(*Task); ok {
