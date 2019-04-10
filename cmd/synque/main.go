@@ -17,72 +17,20 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"os"
-	"path/filepath"
-
-	"github.com/drillbits/synque"
 
 	"github.com/google/subcommands"
-	"github.com/mitchellh/go-homedir"
 )
 
-var config synque.Config
+type stringsFlagValue []string
 
-type runCmd struct {
-	confdir string
-	config  synque.Config
+func (ss *stringsFlagValue) String() string {
+	return "my string representation"
 }
 
-func (*runCmd) Name() string {
-	return "run"
-}
-
-func (*runCmd) Synopsis() string {
-	return "run synque server."
-}
-
-func (*runCmd) Usage() string {
-	return `run [-config] <config dir>:
-  Run synque server.
-`
-}
-
-func (cmd *runCmd) SetFlags(f *flag.FlagSet) {
-	home, err := homedir.Dir()
-	if err != nil {
-		panic(err)
-	}
-	f.StringVar(&cmd.confdir, "config", filepath.Join(home, ".config", "synque"), "config directory")
-
-	path := filepath.Join(cmd.confdir, "config.toml")
-	config, err := synque.LoadConfig(path)
-	if err != nil {
-		panic(err)
-	}
-	cmd.config = *config
-}
-
-func (cmd *runCmd) Execute(ctx context.Context, flagset *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	client, err := synque.NewDriveClient(ctx, cmd.confdir)
-	if err != nil {
-		log.Printf("failed to create client: %s", err)
-		return subcommands.ExitFailure
-	}
-
-	maxWorkers := cmd.config.MaxWorkerSize
-	maxQueues := cmd.config.MaxQueueSize
-	d := synque.NewDispatcher(client, maxWorkers, maxQueues)
-
-	addr := cmd.config.Address
-	srv := synque.NewServer(d, addr)
-	log.Printf("listen %s", addr)
-	go srv.ListenAndServe()
-
-	d.Start()
-	d.Wait()
-
-	return subcommands.ExitSuccess
+func (ss *stringsFlagValue) Set(value string) error {
+	*ss = append(*ss, value)
+	return nil
 }
 
 func main() {

@@ -15,12 +15,12 @@
 package synque
 
 import (
-	"path/filepath"
-	"mime"
-	"os"
 	"encoding/json"
 	"log"
+	"mime"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/rs/xid"
