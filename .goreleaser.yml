@@ -1,5 +1,5 @@
 builds:
-  - main: cmd/synque/main.go
+  - main: cmd/synque/*.go
     binary: synque
     goos:
       - windows
